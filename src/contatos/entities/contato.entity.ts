@@ -1,4 +1,6 @@
-import { Entity, PrimaryGeneratedColumn, Column } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, OneToMany } from 'typeorm';
+import { Fornecedore } from '../../fornecedores/entities/fornecedore.entity';
+import { Usuario } from '../../usuarios/entities/usuario.entity';
 
 @Entity('contatos')
 export class Contato {
@@ -22,4 +24,10 @@ export class Contato {
 
   @Column({ default: true })
   ativo: boolean;
+
+  @OneToMany(() => Fornecedore, (f) => f.contato)
+  fornecedores?: Fornecedore[];
+
+  @OneToMany(() => Usuario, (u) => u.contato)
+  usuarios?: Usuario[];
 }

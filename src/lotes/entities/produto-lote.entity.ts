@@ -1,7 +1,8 @@
-import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, JoinColumn } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, JoinColumn, OneToMany } from 'typeorm';
 import { Produto } from '../../produtos/entities/produto.entity';
 import { Usuario } from '../../usuarios/entities/usuario.entity';
 import { Localizacao } from '../../locais/entities/localizacao.entity';
+import { MovimentacaoEstoque } from '../../movimentacoes/entities/movimentacao-estoque.entity';
 
 @Entity('produto_lotes')
 export class ProdutoLote {
@@ -37,4 +38,7 @@ export class ProdutoLote {
 
   @Column({ default: true })
   ativo: boolean;
+
+  @OneToMany(() => MovimentacaoEstoque, (m) => m.lote)
+  movimentacoes?: MovimentacaoEstoque[];
 }

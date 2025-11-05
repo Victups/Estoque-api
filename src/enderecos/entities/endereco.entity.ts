@@ -1,4 +1,5 @@
-import { Entity, PrimaryGeneratedColumn, Column } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, OneToMany } from 'typeorm';
+import { Deposito } from '../../depositos/entities/deposito.entity';
 
 @Entity('enderecos')
 export class Endereco {
@@ -22,4 +23,7 @@ export class Endereco {
 
   @Column({ default: true })
   ativo: boolean;
+
+  @OneToMany(() => Deposito, (d) => d.endereco)
+  depositos?: Deposito[];
 }

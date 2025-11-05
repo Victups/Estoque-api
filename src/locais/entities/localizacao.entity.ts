@@ -1,5 +1,6 @@
-import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, JoinColumn } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, JoinColumn, OneToMany } from 'typeorm';
 import { Deposito } from '../../depositos/entities/deposito.entity';
+import { MovimentacaoEstoque } from '../../movimentacoes/entities/movimentacao-estoque.entity';
 
 @Entity('localizacoes')
 export class Localizacao {
@@ -21,4 +22,10 @@ export class Localizacao {
 
   @Column({ type: 'boolean', default: true })
   ativo: boolean;
+
+  @OneToMany(() => MovimentacaoEstoque, (m) => m.localizacaoOrigem)
+  movimentacoesOrigem?: MovimentacaoEstoque[];
+
+  @OneToMany(() => MovimentacaoEstoque, (m) => m.localizacaoDestino)
+  movimentacoesDestino?: MovimentacaoEstoque[];
 }
