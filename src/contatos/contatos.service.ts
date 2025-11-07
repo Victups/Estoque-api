@@ -24,14 +24,21 @@ export class ContatosService {
   }
 
   async findAll(): Promise<Contato[]> {
-    return this.repo.find();
+    return this.repo.find({
+      relations: ['fornecedores', 'usuarios'],
+    });
   }
 
   async findOne(id: number): Promise<Contato> {
-    const contato = await this.repo.findOne({ where: { id } });
+    const contato = await this.repo.findOne({
+      where: { id },
+      relations: ['fornecedores', 'usuarios'],
+    });
+    
     if (!contato) {
       throw new NotFoundException(`Contato com id ${id} não encontrado`);
     }
+    
     return contato;
   }
 

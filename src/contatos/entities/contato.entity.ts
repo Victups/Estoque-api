@@ -25,9 +25,9 @@ export class Contato {
   @Column({ default: true })
   ativo: boolean;
 
-  @OneToMany(() => Fornecedore, (f) => f.contato)
+  @OneToMany(() => Fornecedore, (f) => f.contato, { cascade: false })
   fornecedores?: Fornecedore[];
 
-  @OneToMany(() => Usuario, (u) => u.contato)
+  @OneToMany(() => Usuario, (u) => u.contato, { cascade: false })
   usuarios?: Usuario[];
 }

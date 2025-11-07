@@ -13,13 +13,13 @@ export class Fornecedore {
 	@Column({ length: 20, nullable: true })
 	cnpj?: string;
 
-	@ManyToOne(() => Contato, { nullable: true })
+	@ManyToOne(() => Contato, { nullable: true, onDelete: 'RESTRICT', onUpdate: 'CASCADE' })
 	@JoinColumn({ name: 'id_contato' })
 	contato?: Contato;
 
 	@Column({ default: true })
 	ativo: boolean;
 
-	@OneToMany(() => ProdutoFornecedor, (pf) => pf.fornecedor)
+	@OneToMany(() => ProdutoFornecedor, (pf) => pf.fornecedor, { cascade: false })
 	produtos: ProdutoFornecedor[];
 }

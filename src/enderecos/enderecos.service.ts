@@ -25,14 +25,21 @@ export class EnderecosService {
   }
 
   async findAll(): Promise<Endereco[]> {
-    return this.repo.find();
+    return this.repo.find({
+      relations: ['depositos'],
+    });
   }
 
   async findOne(id: number): Promise<Endereco> {
-    const endereco = await this.repo.findOne({ where: { id } });
+    const endereco = await this.repo.findOne({
+      where: { id },
+      relations: ['depositos', 'depositos.localizacoes'],
+    });
+    
     if (!endereco) {
       throw new NotFoundException(`Endereço com id ${id} não encontrado`);
     }
+    
     return endereco;
   }
 

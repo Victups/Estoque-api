@@ -12,6 +12,6 @@ export class Marca {
   @Column({ default: true })
   ativo: boolean;
 
-  @OneToMany(() => Produto, (p) => p.marca)
+  @OneToMany(() => Produto, (p) => p.marca, { cascade: false })
   produtos: Produto[];
 }

@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { CreateFornecedoreDto } from './dto/create-fornecedore.dto';
@@ -12,23 +12,51 @@ export class FornecedoresService {
     private readonly repo: Repository<Fornecedore>,
   ) {}
 
-  create(createFornecedoreDto: CreateFornecedoreDto) {
-    return 'This action adds a new fornecedore';
+  async create(createFornecedoreDto: CreateFornecedoreDto): Promise<Fornecedore> {
+    const fornecedor = this.repo.create({
+      ...createFornecedoreDto,
+      contato: createFornecedoreDto.id_contato ? { id: createFornecedoreDto.id_contato } as any : undefined,
+    });
+    return this.repo.save(fornecedor);
   }
 
-  findAll() {
-    return `This action returns all fornecedores`;
+  async findAll(): Promise<Fornecedore[]> {
+    return this.repo.find({
+      relations: ['contato', 'produtos', 'produtos.produto'],
+    });
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} fornecedore`;
+  async findOne(id: number): Promise<Fornecedore> {
+    const fornecedor = await this.repo.findOne({
+      where: { id },
+      relations: ['contato', 'produtos', 'produtos.produto', 'produtos.produto.unidadeMedida'],
+    });
+
+    if (!fornecedor) {
+      throw new NotFoundException(`Fornecedor com id ${id} não encontrado`);
+    }
+
+    return fornecedor;
   }
 
-  update(id: number, updateFornecedoreDto: UpdateFornecedoreDto) {
-    return `This action updates a #${id} fornecedore`;
+  async update(id: number, updateFornecedoreDto: UpdateFornecedoreDto): Promise<Fornecedore> {
+    const fornecedor = await this.repo.preload({
+      id,
+      ...updateFornecedoreDto,
+      ...(updateFornecedoreDto.id_contato && {
+        contato: { id: updateFornecedoreDto.id_contato } as any,
+      }),
+    });
+
+    if (!fornecedor) {
+      throw new NotFoundException(`Fornecedor com id ${id} não encontrado`);
+    }
+
+    return this.repo.save(fornecedor);
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} fornecedore`;
+  async remove(id: number): Promise<void> {
+    const fornecedor = await this.findOne(id);
+    await this.repo.remove(fornecedor);
   }
 }

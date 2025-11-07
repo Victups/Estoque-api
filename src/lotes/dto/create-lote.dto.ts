@@ -8,9 +8,9 @@ export class CreateLoteDto {
   id_produto: number;
 
   @IsString()
-  @IsNotEmpty()
+  @IsOptional()
   @MaxLength(50)
-  codigo_lote: string;
+  codigo_lote?: string;
 
   @Type(() => Date)
   @IsDate()

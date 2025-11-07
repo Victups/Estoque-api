@@ -24,6 +24,6 @@ export class Endereco {
   @Column({ default: true })
   ativo: boolean;
 
-  @OneToMany(() => Deposito, (d) => d.endereco)
+  @OneToMany(() => Deposito, (d) => d.endereco, { cascade: false })
   depositos?: Deposito[];
 }

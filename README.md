@@ -25,6 +25,10 @@
 
 [Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
 
+## Notas de Domínio
+
+- A geração automática dos códigos de produtos (`PROD###`) e lotes (`L###`) agora é realizada exclusivamente pelo backend. O banco não utiliza mais triggers para esse fluxo; ao criar registros via API, envie o campo de código apenas quando desejar sobrescrever manualmente o padrão.
+
 ## Project setup
 
 ```bash

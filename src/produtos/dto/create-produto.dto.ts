@@ -10,6 +10,11 @@ export class CreateProdutoDto {
 
     @IsString()
     @IsOptional()
+    @MaxLength(50)
+    codigo?: string;
+
+    @IsString()
+    @IsOptional()
     @MaxLength(500)
     descricao?: string;
 

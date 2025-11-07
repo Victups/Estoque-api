@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Localizacao } from './entities/localizacao.entity';
@@ -12,24 +12,59 @@ export class LocaisService {
 		private readonly repo: Repository<Localizacao>,
 	) {}
 
-	create(createLocalDto: CreateLocalDto) {
-		return this.repo.save(createLocalDto as any);
+	async create(createLocalDto: CreateLocalDto): Promise<Localizacao> {
+		const localizacao = this.repo.create({
+			...createLocalDto,
+			deposito: { id: createLocalDto.id_deposito } as any,
+		});
+		return this.repo.save(localizacao);
 	}
 
-	findAll() {
-		return this.repo.find();
+	async findAll(): Promise<Localizacao[]> {
+		return this.repo.find({
+			relations: ['deposito', 'deposito.endereco'],
+		});
 	}
 
-	findOne(id: number) {
-		return this.repo.findOneBy({ id });
+	async findOne(id: number): Promise<Localizacao> {
+		const localizacao = await this.repo.findOne({
+			where: { id },
+			relations: [
+				'deposito',
+				'deposito.endereco',
+				'lotes',
+				'lotes.produto',
+				'movimentacoesOrigem',
+				'movimentacoesDestino',
+				'registrosMovimentacao',
+			],
+		});
+
+		if (!localizacao) {
+			throw new NotFoundException(`Localização com id ${id} não encontrada`);
+		}
+
+		return localizacao;
 	}
 
-	async update(id: number, updateLocalDto: UpdateLocalDto) {
-		await this.repo.update(id, updateLocalDto as any);
-		return this.findOne(id);
+	async update(id: number, updateLocalDto: UpdateLocalDto): Promise<Localizacao> {
+		const localizacao = await this.repo.preload({
+			id,
+			...updateLocalDto,
+			...(updateLocalDto.id_deposito && {
+				deposito: { id: updateLocalDto.id_deposito } as any,
+			}),
+		});
+
+		if (!localizacao) {
+			throw new NotFoundException(`Localização com id ${id} não encontrada`);
+		}
+
+		return this.repo.save(localizacao);
 	}
 
-	remove(id: number) {
-		return this.repo.delete(id);
+	async remove(id: number): Promise<void> {
+		const localizacao = await this.findOne(id);
+		await this.repo.remove(localizacao);
 	}
 }

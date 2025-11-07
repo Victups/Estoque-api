@@ -15,6 +15,6 @@ export class UnidadeMedida {
   @Column({ default: true })
   ativo: boolean;
 
-  @OneToMany(() => Produto, (p) => p.unidadeMedida)
+  @OneToMany(() => Produto, (p) => p.unidadeMedida, { cascade: false })
   produtos: Produto[];
 }

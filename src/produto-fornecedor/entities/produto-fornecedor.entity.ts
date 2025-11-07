@@ -10,11 +10,11 @@ export class ProdutoFornecedor {
   @PrimaryColumn({ name: 'id_fornecedor' })
   idFornecedor: number;
 
-  @ManyToOne(() => Produto, (p) => p.fornecedores)
+  @ManyToOne(() => Produto, (p) => p.fornecedores, { onDelete: 'RESTRICT', onUpdate: 'CASCADE' })
   @JoinColumn({ name: 'id_produto' })
   produto: Produto;
 
-  @ManyToOne(() => Fornecedore, (f) => f.produtos)
+  @ManyToOne(() => Fornecedore, (f) => f.produtos, { onDelete: 'RESTRICT', onUpdate: 'CASCADE' })
   @JoinColumn({ name: 'id_fornecedor' })
   fornecedor: Fornecedore;
 

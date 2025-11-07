@@ -10,13 +10,13 @@ export class Deposito {
   @Column({ type: 'varchar', length: 100 })
   nome: string;
 
-  @ManyToOne(() => Endereco, { nullable: true })
+  @ManyToOne(() => Endereco, { nullable: true, onDelete: 'RESTRICT', onUpdate: 'CASCADE' })
   @JoinColumn({ name: 'id_endereco' })
   endereco?: Endereco;
 
   @Column({ type: 'boolean', default: true })
   ativo: boolean;
 
-  @OneToMany(() => Localizacao, (l) => l.deposito)
+  @OneToMany(() => Localizacao, (l) => l.deposito, { cascade: false })
   localizacoes: Localizacao[];
 }

@@ -17,6 +17,8 @@ export class ProdutoFornecedorService {
       idProduto: createProdutoFornecedorDto.id_produto,
       idFornecedor: createProdutoFornecedorDto.id_fornecedor,
       usuarioLogId: createProdutoFornecedorDto.usuario_log_id,
+      produto: { id: createProdutoFornecedorDto.id_produto } as any,
+      fornecedor: { id: createProdutoFornecedorDto.id_fornecedor } as any,
     });
     return this.repo.save(produtoFornecedor);
   }

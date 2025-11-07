@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Deposito } from './entities/deposito.entity';
@@ -12,24 +12,51 @@ export class DepositosService {
 		private readonly repo: Repository<Deposito>,
 	) {}
 
-	create(createDto: CreateDepositoDto) {
-		return this.repo.save(createDto as any);
+	async create(createDto: CreateDepositoDto): Promise<Deposito> {
+		const deposito = this.repo.create({
+			...createDto,
+			endereco: createDto.id_endereco ? { id: createDto.id_endereco } as any : undefined,
+		});
+		return this.repo.save(deposito);
 	}
 
-	findAll() {
-		return this.repo.find();
+	async findAll(): Promise<Deposito[]> {
+		return this.repo.find({
+			relations: ['endereco', 'localizacoes'],
+		});
 	}
 
-	findOne(id: number) {
-		return this.repo.findOneBy({ id });
+	async findOne(id: number): Promise<Deposito> {
+		const deposito = await this.repo.findOne({
+			where: { id },
+			relations: ['endereco', 'localizacoes'],
+		});
+
+		if (!deposito) {
+			throw new NotFoundException(`Depósito com id ${id} não encontrado`);
+		}
+
+		return deposito;
 	}
 
-	async update(id: number, dto: UpdateDepositoDto) {
-		await this.repo.update(id, dto as any);
-		return this.findOne(id);
+	async update(id: number, dto: UpdateDepositoDto): Promise<Deposito> {
+		const deposito = await this.repo.preload({
+			id,
+			...dto,
+			...(dto.id_endereco && {
+				endereco: { id: dto.id_endereco } as any,
+			}),
+		});
+
+		if (!deposito) {
+			throw new NotFoundException(`Depósito com id ${id} não encontrado`);
+		}
+
+		return this.repo.save(deposito);
 	}
 
-	remove(id: number) {
-		return this.repo.delete(id);
+	async remove(id: number): Promise<void> {
+		const deposito = await this.findOne(id);
+		await this.repo.remove(deposito);
 	}
 }

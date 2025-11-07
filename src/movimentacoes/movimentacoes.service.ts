@@ -1,9 +1,7 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { MovimentacaoEstoque } from './entities/movimentacao-estoque.entity';
-import { CreateMovimentacaoDto } from './dto/create-movimentacao.dto';
-import { UpdateMovimentacaoDto } from './dto/update-movimentacao.dto';
 
 @Injectable()
 export class MovimentacoesService {
@@ -12,24 +10,41 @@ export class MovimentacoesService {
 		private readonly repo: Repository<MovimentacaoEstoque>,
 	) {}
 
-	create(createDto: CreateMovimentacaoDto) {
-		return this.repo.save(createDto as any);
+	async findAll(): Promise<MovimentacaoEstoque[]> {
+		return this.repo.find({
+			relations: [
+				'produto',
+				'produto.unidadeMedida',
+				'produto.marca',
+				'produto.categoria',
+				'lote',
+				'lote.produto',
+				'createdBy',
+				'updatedBy',
+		],
+		});
 	}
 
-	findAll() {
-		return this.repo.find();
+	async findOne(id: number): Promise<MovimentacaoEstoque> {
+		const movimentacao = await this.repo.findOne({
+			where: { id },
+			relations: [
+				'produto',
+				'produto.unidadeMedida',
+				'produto.marca',
+				'produto.categoria',
+				'lote',
+				'lote.produto',
+				'createdBy',
+				'updatedBy',
+		],
+		});
+
+		if (!movimentacao) {
+			throw new NotFoundException(`Movimentação com id ${id} não encontrada`);
+		}
+
+		return movimentacao;
 	}
 
-	findOne(id: number) {
-		return this.repo.findOneBy({ id });
-	}
-
-	async update(id: number, dto: UpdateMovimentacaoDto) {
-		await this.repo.update(id, dto as any);
-		return this.findOne(id);
-	}
-
-	remove(id: number) {
-		return this.repo.delete(id);
-	}
 }
